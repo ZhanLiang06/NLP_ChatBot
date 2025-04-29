@@ -4,9 +4,9 @@ __pycache__/
 *$py.class
 
 # Database
-pdf_store
-data
-vector_data
+pdf_store/
+data/
+vector_data/
 
 # C extensions
 *.so
