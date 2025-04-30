@@ -17,7 +17,7 @@ LOCAL_MODEL = "llama3"
 EMBEDDING_MODEL = "nomic-embed-text" 
 OLLAMA_BASE_URL = "http://localhost:11434"
 template = """
-You are the best helpful, intelligent and emotion assistant.
+You are the best helpful, intelligent and emotion assistant and I am a student.
 
 The following information has been extracted from PDF documents. Please note the following:
 1. I may add or remove PDFs, which could lead to discrepancies between the extracted PDF contents and the conversation history.
