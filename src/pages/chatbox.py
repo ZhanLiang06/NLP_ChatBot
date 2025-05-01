@@ -8,19 +8,29 @@ import uuid
 from datetime import datetime
 from streamlit_chat import message as display_chat_dialogue
 from langchain.schema import HumanMessage, AIMessage
+from streamlit.components.v1 import html
+from src.db_manager.cookie_manager import CookieMgr
+import time
 
 def show_chatbox_ui(user_info):
-    components.show_header('PDF AI CHATBOT')
     mongo_db = MongoDB()
     #get number of conversations
     conversations = mongo_db.get_conversation(user_id=user_info['userId'])
-
-    # dumdumdum = ChatBot(user_info)
 
     # Sidebar - PDF Upload
     selected_convo = None
     curr_convo_data = None
     with st.sidebar:
+        # Account Section
+        with st.expander(f"Account ({user_info['username']})", expanded=False):
+            if st.button("Log Out", key="logout_btn", help="Click to log out of your account"):
+                st.session_state['logged_in'] = False
+                st.session_state['user_info'] = None
+                cookies = st.session_state.get('cookie_instance')
+                CookieMgr.removeUserInfoCookie(cookies)
+                st.session_state['curr_page'] = 'success_logout'
+                st.rerun()
+                
         ##Show all conversations
         first_conver = next(conversations, None)
         if first_conver:
@@ -175,7 +185,7 @@ def display_pdf_upload(curr_convo_data):
 
 
 def display_main_chat_box(curr_convo_data):
-
+    components.show_header("Start of Conversation")
     # if 1st run
     if 'curr_conver_id' not in st.session_state:
         st.session_state['curr_conver_id'] = curr_convo_data['id']
@@ -211,18 +221,67 @@ def display_main_chat_box(curr_convo_data):
     if "pending_input" not in st.session_state:
         st.session_state["pending_input"] = None
     
+    if "user_query_input" not in st.session_state:
+        st.session_state["user_query_input"] = ''
+
+    
     # Get input
     if st.session_state["pending_input"] is None:
         input_col = st.empty()
         with input_col.container():
-            query = st.text_input("💬 Ask a question about the PDF")
-            if st.button("🔍 Get Answer"):
-                if query:
-                    st.session_state["pending_input"] = query
-                    input_col.empty()
-                    st.rerun
-                else:
-                    st.warning("Please enter a question.")
+            col1, col2 = st.columns([5, 1])
+            with col1:
+                query = st.text_input(
+                    f"Current Conversation: {curr_convo_data['title']}", 
+                    key="user_query_input",
+                    value=st.session_state["user_query_input"],
+                    placeholder="💬 Ask a question about the PDF",
+                    on_change=lambda: setattr(st.session_state, "pending_input", st.session_state.user_query_input),
+                )
+            with col2:
+                st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
+                if st.button("🔍 Get Answer", key="get_answer_btn"):
+                    if st.session_state.user_query_input and st.session_state.user_query_input.strip():
+                        st.session_state["pending_input"] = st.session_state.user_query_input
+                        st.session_state.user_query_input = ""  # Clear the input
+                        input_col.empty()
+                        st.rerun()
+                    else:
+                        st.warning("Please enter a question.")
+            
+            html("""
+            <script>
+            setTimeout(() => {
+                const input = window.parent.document.querySelector('input[aria-label*="Current Conversation"]');
+                if (input) {
+                    input.focus();
+                    //-----------
+                    // Function to check if user is at bottom
+                    function isAtBottom() {
+                        return window.parent.scrollY + window.parent.innerHeight >= document.body.scrollHeight - 50;
+                    }
+                    
+                    // Scroll to bottom when typing starts
+                    input.addEventListener('input', function() {
+                        if (!isAtBottom()) {
+                            window.parent.scrollTo(-10, document.body.scrollHeight);
+                        }
+                    });
+                    //--------------
+                    // Handle Enter key
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            window.parent.document.querySelector('button[data-testid="stButton"]').click();
+                            setTimeout(() => {
+                                window.parent.scrollTo(0, document.body.scrollHeight);
+                            }, 100);
+                        }
+                    });
+                }
+            }, 100);
+            </script>
+            """, height=0)
     
     if st.session_state["pending_input"] is not None:
         query = st.session_state["pending_input"]
@@ -230,9 +289,24 @@ def display_main_chat_box(curr_convo_data):
         user_query_langchain_msg = HumanMessage(content=query)
         display_chat_dialogue(query,is_user=True,key=str(count))
         count += 1
-        ai_response_dict = chatbot.ask_question(user_query_dict)
-        ai_response_langchain_msg = AIMessage(content=ai_response_dict['content'])
+        with st.spinner('🤔 Thinking...'):
+            html("""
+            <script>
+            setTimeout(() => {
+                const scrollContainer = window.parent.document.querySelector('.main .block-container');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }
+            }, 100);
+            </script>
+            """, height=0)
+            start_time = time.time()
+            ai_response_dict = chatbot.ask_question(user_query_dict)
+            inference_time = time.time() - start_time
+            ai_response_langchain_msg = AIMessage(content=ai_response_dict['content'])
         display_chat_dialogue(ai_response_dict['content'],key=str(count))
+        st.write(f"Response time: {inference_time:.2f} seconds")
+
         
         ##update session
         st.session_state['str_hist'].append(user_query_dict)
@@ -246,32 +320,10 @@ def display_main_chat_box(curr_convo_data):
             mongo_db = MongoDB()
             mongo_db.insert_one_conver(curr_convo_data)
             st.session_state['need_save_conver'] = False
-
+        
         st.rerun()
 
-    # ## User Input & Show Output
-    # input_box = st.empty()
-    # query = input_box.text_input("💬 Ask a question about the PDF")
-    # if input_box.button("🔍 Get Answer"):
-    #     if query:
-    #         input_box.empty()
-    #         user_query_dict = {"role":"human","content":query,"timestamp":datetime.now()}
-    #         user_query_langchain_msg = HumanMessage(content=query)
-    #         display_chat_dialogue(query,is_user=True,key=str(count))
-    #         count += 1
-    #         response = chatbot.ask_question(query)
-    #         ai_response_dict = {"role":"AI","content":response,"timestamp":datetime.now()}
-    #         ai_response_langchain_msg = AIMessage(content=response)
-    #         display_chat_dialogue(response,key=str(count))
-            
-    #         ##update session
-    #         st.session_state['str_hist'].append(user_query_dict)
-    #         st.session_state['str_hist'].append(ai_response_dict)
-    #         st.session_state['parsed_hist'].append(user_query_langchain_msg)
-    #         st.session_state['parsed_hist'].append(ai_response_langchain_msg)
-    #         st.rerun()
-    #     else:
-    #         st.warning("Please enter a question.")
+
 
 def _load_history_from_mongo(conver_id):
     parsed_history = []
@@ -287,3 +339,4 @@ def _load_history_from_mongo(conver_id):
             elif msg['role'] == 'AI':
                 parsed_history.append(AIMessage(content=msg['content']))
     return str_history, parsed_history
+
