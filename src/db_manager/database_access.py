@@ -1,6 +1,7 @@
 import pymysql
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from datetime import datetime
 
 class MongoDB:
     _global_instance  = None
@@ -60,7 +61,13 @@ class MongoDB:
 
     def del_all_conversation(self):
         return self._retry_on_failure(self.db.conversation.delete_many, {})
-        
+
+    def update_conversation_timestamp(self, conversation_id: str, timestamp: datetime):
+        """Update the timestamp of a conversation."""
+        self.db.conversation.update_one(
+            {"id": conversation_id},
+            {"$set": {"timestamp": timestamp}}
+        )
 
 class MySqlDB:
     _global_instance = None
