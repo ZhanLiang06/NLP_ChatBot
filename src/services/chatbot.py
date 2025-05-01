@@ -15,7 +15,8 @@ from datetime import datetime
 PERSIST_DIR = "vector_data"
 LOCAL_MODEL = "llama3"
 EMBEDDING_MODEL = "nomic-embed-text" 
-OLLAMA_BASE_URL = "https://typical-shel-tarumt-a31d548a.koyeb.app/"
+#http://localhost:11434
+OLLAMA_BASE_URL = "http://localhost:11434"
 template = """
 You are the best helpful, intelligent and emotion assistant and I am a student.
 
