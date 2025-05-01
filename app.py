@@ -1,4 +1,8 @@
 import streamlit as st
+
+# Streamlit UI Configuration
+st.set_page_config(page_title="📄 AI PDF Chatbot", layout="wide")
+
 from streamlit_cookies_manager import EncryptedCookieManager
 from src.pages.chatbox import show_chatbox_ui
 from src.pages.login_sign_up import show_login_page,show_signup_page,show_success_signup,show_success_logout
@@ -6,10 +10,6 @@ from src.db_manager.cookie_manager import CookieMgr
 from src.db_manager.database_access import MongoDB
 from streamlit.components.v1 import html
 MongoDB()
-
-# Streamlit UI Configuration
-st.set_page_config(page_title="📄 AI PDF Chatbot", layout="wide")
-
 
 # Check got user login or not since streamlit keep reruning
 cookies = EncryptedCookieManager(
