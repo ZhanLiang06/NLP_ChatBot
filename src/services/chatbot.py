@@ -16,7 +16,7 @@ PERSIST_DIR = "vector_data"
 LOCAL_MODEL = "llama3"
 EMBEDDING_MODEL = "nomic-embed-text" 
 #https://typical-shel-tarumt-a31d548a.koyeb.app/
-OLLAMA_BASE_URL = "https://typical-shel-tarumt-a31d548a.koyeb.app/"
+OLLAMA_BASE_URL = "http://localhost:11434"
 template = """
 You are an intelligent, emotionally aware, and context-sensitive assistant helping a student.
 You are expected to interpret and respond using extracted content from uploaded PDF documents, along with optional external knowledge when relevant. Follow these strict guidelines:
