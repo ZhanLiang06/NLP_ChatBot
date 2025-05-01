@@ -27,9 +27,14 @@ class DocumentProcessor():
         for doc in data:
             doc.metadata["source"] = filename
         
+        
         # Text Splitting
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
         all_splits = text_splitter.split_documents(data)
+
+        for doc in all_splits:
+            doc.page_content = f"Source PDF: {filename}\n" + doc.page_content
+
         print(f"Using Chroma collection: {self.conver_collection_name}")
 
         ## Append
