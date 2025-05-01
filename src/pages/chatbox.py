@@ -279,26 +279,24 @@ def display_main_chat_box(curr_convo_data):
     if st.session_state["pending_input"] is None:
         input_col = st.empty()
         with input_col.container():
-            # Add CSS to hide form border
-            st.markdown("""
-                <style>
+            with st.form("chat_form", clear_on_submit=True):
+                st.markdown("""
+                    <style>
                     div[data-testid="stForm"] {
                         border: none;
                         padding: 0;
                     }
-                </style>
-            """, unsafe_allow_html=True)
-            
-            with st.form("chat_form", clear_on_submit=True):
+                    </style>
+                """, unsafe_allow_html=True)
+                
                 col1, col2 = st.columns([5, 1])
                 with col1:
-                    
                     query = st.text_input(
                         f"Current Conversation: {curr_convo_data['title']}", 
                         key="user_query_input",
                         value="",
                         placeholder="💬 Ask a question about the PDF",
-                        label_visibility="hidden",
+                        label_visibility="collapsed",
                         autocomplete="off"
                     )
                 with col2:
