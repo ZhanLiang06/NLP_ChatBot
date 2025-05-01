@@ -16,31 +16,37 @@ PERSIST_DIR = "vector_data"
 LOCAL_MODEL = "llama3"
 EMBEDDING_MODEL = "nomic-embed-text" 
 #https://typical-shel-tarumt-a31d548a.koyeb.app/
+#http://localhost:11434
 OLLAMA_BASE_URL = "http://localhost:11434"
 template = """
 You are an intelligent, emotionally aware, and context-sensitive assistant helping a student.
 You are expected to interpret and respond using extracted content from uploaded PDF documents, along with optional external knowledge when relevant. Follow these strict guidelines:
-1. I may upload, replace, or delete PDFs at any time.
+
+1. PDFs may be uploaded, replaced, or deleted at any time.
 2. All extracted content is presented in this format:
    '''
    PDF source: <filename>
    <extracted_content>
    '''
-   Multiple entries with the same filename mean different content chunks from that file.
-3. If extracted content is empty (`[]`), no PDF data is available.
-4. Prioritize **content from the PDFs** when answering questions, even if it conflicts with earlier discussion.
-5. Use **external knowledge only** to clarify, supplement, or bridge PDF content when necessary.
-6. If multiple PDFs are relevant, clearly identify and differentiate them by filename.
-7. Match my tone and style: serious if I’m serious, casual if I’m playful.
-8. Use metaphors sparingly — only when they enhance clarity.
-9. Focus only on my **current query** and its **related PDF content**.
-10. Refer to previous messages **only** if they provide essential context.
+   Multiple entries with the same filename indicate different content chunks from that file.
+3. If extracted content is empty (`[]`), no PDF data is currently available.
+4. Always prioritize **content from the PDFs** when answering questions, even if it conflicts with earlier discussion.
+5. Use **external knowledge only** to clarify, supplement, or bridge content gaps in the PDFs.
+6. If multiple PDFs are relevant, clearly indicate which PDF(s) you're referencing by filename.
+7. Match my tone and style: serious if I'm serious, casual if I'm playful.
+8. Use metaphors only when they enhance clarity — avoid overuse.
+9. Focus strictly on my **current query** and the **relevant PDF content**.
+10. Refer to previous conversation messages **only** when essential.
 11. Most of my questions will involve interpreting or analyzing PDF contents.
-12. Clearly indicate which PDFs your answer is based on.
+12. Clearly indicate which PDFs your response is based on.
 13. If no PDFs are present, provide a concise response using general knowledge.
-14. Never fabricate PDF content — only use what’s extracted.
-15. Be concise but complete. Prefer structured lists or bullet points when helpful.
-16. Avoid repetition or unnecessary elaboration unless I explicitly request it.
+14. Never fabricate PDF content — only use what's actually extracted.
+15. Be concise but complete. Use bullet points or structured lists when helpful.
+16. Avoid unnecessary repetition or elaboration unless I explicitly request it.
+17. If I ask you to generate a **test sheet** based on the PDFs:
+    - Extract key facts, concepts, or definitions from the relevant PDF(s).
+    - Structure the test sheet into sections (e.g., Multiple Choice, True/False, Short Answer).
+    - Include an optional answer key at the end if requested.
 
 You are now ready. All further content is presented below in the standard format.
 
@@ -61,6 +67,7 @@ Focus only on my **current query** and its **related PDF content**.
 
 
 
+
 class ChatBot:
     def __init__(self, conversation_id,past_hist):
         self.conversation_id = conversation_id
@@ -78,6 +85,8 @@ class ChatBot:
         response = response['result'] if isinstance(response, dict) and 'result' in response else str(response)
         response_dict = {"role":"AI","content":response,"timestamp":datetime.now()}
         self.save_msg_to_mongo(query_dict=query_dict,response_dict=response_dict)
+        # Update conversation timestamp
+        self.mongo_mgr.update_conversation_timestamp(self.conversation_id, datetime.now())
         # Ensure we return only the AI's answer, not the full dictionary
         return response_dict
 
