@@ -227,6 +227,11 @@ def show_login_page():
     if general_error:
         st.markdown(f'<p class="error-message">{general_error}</p>', unsafe_allow_html=True)
     
+    # Add forget password link
+    if st.button("Forgot Password?", key="forget_password_btn"):
+        st.session_state['curr_page'] = 'forget_password'
+        st.rerun()
+    
     if st.button("Sign Up", key="signup_btn"):
         st.session_state['curr_page'] = 'signup'
         st.rerun()
@@ -255,7 +260,7 @@ def show_signup_page():
                 email_error = "Email is required"
             elif not usrAccMgr._is_valid_email(email):
                 email_error = "Invalid email format"
-            elif usrAccMgr._check_email_exists(email):
+            elif usrAccMgr.check_email_exists(email):
                 email_error = "Email already exists"
                 
             if not username:

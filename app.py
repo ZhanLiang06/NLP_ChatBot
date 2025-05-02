@@ -6,6 +6,7 @@ st.set_page_config(page_title="📄 AI PDF Chatbot", layout="wide")
 from streamlit_cookies_manager import EncryptedCookieManager
 from src.pages.chatbox import show_chatbox_ui
 from src.pages.login_sign_up import show_login_page,show_signup_page,show_success_signup,show_success_logout
+from src.pages.forget_password import show_forget_password_page
 from src.db_manager.cookie_manager import CookieMgr
 from src.db_manager.database_access import MongoDB
 from streamlit.components.v1 import html
@@ -44,6 +45,8 @@ match curr_page:
         show_login_page()
     case 'success_logout':
         show_success_logout()
+    case 'forget_password':
+        show_forget_password_page()
     case 'chatbox':
         cookies = st.session_state.get('cookie_instance')
         user_info = st.session_state.get('user_info')
