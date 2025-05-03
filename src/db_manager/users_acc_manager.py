@@ -38,6 +38,11 @@ class UserAccountManager:
         result = self.sqlDB.execute_select_one_query(query, (email,))
         return result is not None
 
+    def check_uid_exists(self, userId):
+        query = "SELECT userId FROM user_accounts WHERE userId = %s"
+        result = self.sqlDB.execute_select_one_query(query, (userId,))
+        return result is not None
+
     def user_login(self, email, password):
         if not self._is_valid_email(email):
             return False, None
@@ -70,6 +75,11 @@ class UserAccountManager:
         hashed_password = self._hash_password(password)
         query = "INSERT INTO user_accounts (userId, email, username, password) VALUES (%s, %s, %s, %s)"
         user_id = str(uuid.uuid4())
+
+        ## check user id is unique
+        while self.check_uid_exists(user_id):
+            user_id = str(uuid.uuid4())
+            
         params = (user_id, email, username, hashed_password.decode('utf-8'))
         
         result = self.sqlDB.execute_insert_query(query=query, params=params)
