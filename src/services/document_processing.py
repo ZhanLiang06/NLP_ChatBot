@@ -33,7 +33,7 @@ class DocumentProcessor():
         all_splits = text_splitter.split_documents(data)
 
         for doc in all_splits:
-            doc.page_content = f"Source PDF: {filename}\n Content: [{doc.page_content}] \nEnd of Content for this chunk."
+            doc.page_content = f"Source PDF: {filename}\n{doc.page_content}\n---End of Content for this chunk.---"
 
         print(f"Using Chroma collection: {self.conver_collection_name}")
 

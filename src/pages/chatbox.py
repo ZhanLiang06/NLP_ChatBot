@@ -72,7 +72,10 @@ def show_chatbox_ui(user_info):
                         "user_id": user_info['userId'],  # Add logic to fetch user_id as needed
                         "timestamp": datetime.now()  # Add a timestamp or other metadata as needed
                     }
-                    mongo_db.insert_one_conver(curr_convo_data)
+                    success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
+                    while success_insert_no_dup == None:
+                        curr_convo_data['id'] = str(uuid.uuid4())
+                        success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
                     st.success(f"New conversation titled '{curr_convo_data['title']}' has been created!")
                     st.session_state['have_new_convo'] = True
                     st.rerun()
@@ -164,19 +167,26 @@ def display_pdf_upload(curr_convo_data):
                 f.write(uploaded_file.read())
 
             status_msg = st.sidebar.empty()
-
-            vec = docProcessor.process_pdf(file_path)
-            if vec:
-                st.session_state["processed_files"].append(unique_filename)
-                global_status_msg.success("✅ Processed files:\n" + "\n".join([f"- {f}" for f in st.session_state["processed_files"]]))
-            else:
-                status_msg.error(f"❌ Failed: {unique_filename}")
+            try:
+                vec = docProcessor.process_pdf(file_path)
+                if vec:
+                    st.session_state["processed_files"].append(unique_filename)
+                    global_status_msg.success("✅ Processed files:\n" + "\n".join([f"- {f}" for f in st.session_state["processed_files"]]))
+                else:
+                    status_msg.error(f"❌ Failed: {unique_filename}")
+            except Exception as ex:
+                print(ex)
+                status_msg.error(f"❌ Failed: {unique_filename} {ex}")
             status_msg.empty()
+                
 
             ## save conversation
             if 'need_save_conver' in st.session_state and st.session_state['need_save_conver'] == True:
                 mongo_db = MongoDB()
-                mongo_db.insert_one_conver(curr_convo_data)
+                success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
+                while success_insert_no_dup == None:
+                    curr_convo_data['id'] = str(uuid.uuid4())
+                    success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
                 st.session_state['need_save_conver'] = False
         processing_msg.empty()
 
@@ -219,8 +229,7 @@ def display_pdf_upload(curr_convo_data):
                     if st.button("❌", key=f"remove_{filename}"):
                         try:
                             success = docProcessor.delete_pdf_from_vectorstore(filename)
-                            if(success):
-                                os.remove(file_path)
+                            os.remove(file_path)
                             st.rerun()
                         except Exception as e:
                             print(f"Exception in removing files: {e}")
@@ -355,7 +364,10 @@ def display_main_chat_box(curr_convo_data):
         ##If this is a new conversation save it
         if 'need_save_conver' in st.session_state and st.session_state['need_save_conver'] == True:
             mongo_db = MongoDB()
-            mongo_db.insert_one_conver(curr_convo_data)
+            success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
+            while success_insert_no_dup == None:
+                curr_convo_data['id'] = str(uuid.uuid4())
+                success_insert_no_dup = mongo_db.insert_one_conver(curr_convo_data)
             st.session_state['need_save_conver'] = False
         
         # Store the inference time in session state before rerun

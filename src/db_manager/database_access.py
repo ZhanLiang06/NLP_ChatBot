@@ -37,7 +37,9 @@ class MongoDB:
                 raise
 
     def insert_one_conver(self, convo_data):
-        print("save convo")
+        if(next(self.get_conversation_by_id(convo_data['id']),None) != None):
+            print("convo ID already exists reinitializing convo ID")
+            return None
         return self._retry_on_failure(self.db.conversation.insert_one, convo_data)
 
     def insert_onepair_msg(self, msg_data):
