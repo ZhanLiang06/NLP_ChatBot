@@ -14,14 +14,16 @@
 
    ```bash
    pip install -r requirements.txt
-Core libaries used:
-|        |        |
-|--------|--------|
-| streamlit           | chromadb               |
-| pypdf               | streamlit_cookies_manager |
-| langchain           | pymysql                |
-| langchain-community | pymongo                |
-| streamlit_chat      | bcrypt                 |
+   ```
+   
+   Core libaries used:
+   |        |        |
+   |--------|--------|
+   | streamlit           | chromadb               |
+   | pypdf               | streamlit_cookies_manager |
+   | langchain           | pymysql                |
+   | langchain-community | pymongo                |
+   | streamlit_chat      | bcrypt                 |
 
 
 3. **Install and Run Ollama on Your Local Machine**  
@@ -36,13 +38,18 @@ Core libaries used:
    ollama pull llama3
    ollama pull nomic-embed-text
    ```
-   If you have executed the above the command successfully before you can skip 4.
+   _If you have executed the above the command successfully before you can skip 4._
 
 5. **Run the Program**
-Option 1: 1After setting up everything, you can launch the application by running the following command in your **Python command prompt**:
 
-```bash
-streamlit run app.py
-```
-Option 2: Using the Batch File (Windows) Run the batch script: '.\run_app.bat'
+   **Option 1**: After setting up everything, you can launch the application by running the following command in your **Python command prompt**:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+     **Option 2**: Using the Batch File (Windows) Run the batch script:
+      ```bash
+      .\run_app.bat
+      ```
 
