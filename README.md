@@ -1,14 +1,48 @@
 ## Title: Interactive PDF Question Answer (QA) Chatbot with Saved Conversation History
-Assignment by Lau Zhan Liang, Shino Kee Hui Wuan, Toh Yun Ning
-### To run the program:
-1. Have a python virtual envirnonemnt with Python 3.12.9
-2. Make Sure you have all the libaries listed in requirements.txt in your python virtual environment
-The core libaries that will be used are
 
-| streamlit  | chromadb     |
-| pypdf | streamlit_cookies_manager     |
-| langchain    | pymysql     |
-| langchain-community    | pymongo   |
-| streamlit_chat    | bcrypt   |
-ollama pull llama3
-ollama pull nomic-embed-text
+**Assignment by**: Lau Zhan Liang, Shino Kee Hui Wuan, Toh Yun Ning
+
+---
+
+### How to Run the Program
+
+1. **Set Up a Python Virtual Environment**  
+   Ensure that your environment is using **Python version 3.12.9**.
+
+2. **Install Required Libraries**  
+   Use the provided `requirements.txt` file to install all dependencies in your virtual environment:
+
+   ```bash
+   pip install -r requirements.txt
+Core libaries used:
+|        |        |
+|--------|--------|
+| streamlit           | chromadb               |
+| pypdf               | streamlit_cookies_manager |
+| langchain           | pymysql                |
+| langchain-community | pymongo                |
+| streamlit_chat      | bcrypt                 |
+
+
+3. **Install and Run Ollama on Your Local Machine**  
+   - Download the **Ollama application** from the official website:  
+     [https://ollama.com](https://ollama.com)
+   - After installation, launch the Ollama app on the **same PC** where you will run this chatbot.
+
+4. **Pull the Required Models for Ollama**  
+   Open **Windows PowerShell** and run the following commands:
+
+   ```bash
+   ollama pull llama3
+   ollama pull nomic-embed-text
+   ```
+   If you have executed the above the command successfully before you can skip 4.
+
+5. **Run the Program**
+Option 1: 1After setting up everything, you can launch the application by running the following command in your **Python command prompt**:
+
+```bash
+streamlit run app.py
+```
+Option 2: Using the Batch File (Windows) Run the batch script: '.\run_app.bat'
+
