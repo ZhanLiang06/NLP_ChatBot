@@ -48,10 +48,10 @@
    streamlit run app.py
    ```
 
-  **Option 2**: Using the Batch File (Windows) Run the batch script:
-   ```bash
-   .\run_app.bat
-   ```
+     **Option 2**: Using the Batch File (Windows) Run the batch script:
+      ```bash
+      .\run_app.bat
+      ```
 
 
 #### ⚠️ Cloud Database Error Note:
