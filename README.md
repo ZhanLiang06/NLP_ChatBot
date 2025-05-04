@@ -48,8 +48,19 @@
    streamlit run app.py
    ```
 
-     **Option 2**: Using the Batch File (Windows) Run the batch script:
-      ```bash
-      .\run_app.bat
-      ```
+  **Option 2**: Using the Batch File (Windows) Run the batch script:
+   ```bash
+   .\run_app.bat
+   ```
+
+
+#### ⚠️ Cloud Database Error Note:
+This application uses Cloud Atlas MongoDB and Amazon RDS (MySQL) for storing conversation history and user credentials.
+
+The database instances may enter an inactive or sleep state due to inactivity.
+
+If you encounter database connection issues, either:
+1. Contact the team members for assistance (Lau Zhan Liang), or
+2. Modify the connection settings in database_access.py with your own created database on cloud.
+
 
