@@ -1,5 +1,5 @@
 import os
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import TokenTextSplitter
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import Chroma
 from langchain.embeddings.ollama import OllamaEmbeddings
@@ -29,7 +29,7 @@ class DocumentProcessor():
         
         
         # Text Splitting
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
+        text_splitter = TokenTextSplitter(chunk_size=768, chunk_overlap=128)
         all_splits = text_splitter.split_documents(data)
 
         for doc in all_splits:
