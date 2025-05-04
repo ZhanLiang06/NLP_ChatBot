@@ -108,8 +108,13 @@ def show_chatbox_ui(user_info):
             st.session_state['str_hist'] = str_hist
             st.session_state['parsed_hist'] = parsed_hist
         else:
-            str_hist = st.session_state['str_hist']
-            parsed_hist = st.session_state['parsed_hist']
+            if 'str_hist' not in st.session_state or 'parsed_hist' not in st.session_state:
+                str_hist, parsed_hist = _load_history_from_mongo(curr_convo_data['id'])
+                st.session_state['str_hist'] = str_hist
+                st.session_state['parsed_hist'] = parsed_hist
+            else:
+                str_hist = st.session_state['str_hist']
+                parsed_hist = st.session_state['parsed_hist']
         
         display_main_chat_box(curr_convo_data)
 
@@ -272,7 +277,12 @@ def display_main_chat_box(curr_convo_data):
 
     ## Initialize Chatbot
     if 'chat_bot_instance' not in st.session_state:
-        st.session_state['chat_bot_instance'] = ChatBot(curr_convo_data['id'],parsed_hist)
+        try:
+            st.session_state['chat_bot_instance'] = ChatBot(curr_convo_data['id'],parsed_hist)
+        except Exception as e:
+            print(f"Exception in initializing ChatBot: {e}")
+            print('RERUNING...')
+            st.rerun()
     elif st.session_state['chat_bot_instance'].conversation_id != curr_convo_data['id']:
         st.session_state['chat_bot_instance'] = ChatBot(curr_convo_data['id'],parsed_hist)
 

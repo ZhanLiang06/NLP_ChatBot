@@ -49,12 +49,15 @@ class UserAccountManager:
 
         query = "SELECT userId, email, username, password FROM user_accounts WHERE email = %s"
         result = self.sqlDB.execute_select_one_query(query, (email,))
-        match_ps = self._check_password(password, result['password'].encode('utf-8'))
+        match_ps = None
         
-        if result and match_ps:
-            # Remove password from result before returning
-            del result['password']
-            return True, result
+        if result:
+            match_ps = self._check_password(password, result['password'])
+            if match_ps:
+                del result['password']
+                return True, result
+            else:
+                return False, None
         elif match_ps == False:
             return False, None
         elif result is None:
