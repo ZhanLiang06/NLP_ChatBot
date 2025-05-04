@@ -10,6 +10,9 @@ pdf_store/
 data/
 vector_data/
 
+# Testing .py file
+test.py
+
 # C extensions
 *.so
 
